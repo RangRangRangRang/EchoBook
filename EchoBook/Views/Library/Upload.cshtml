@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<div class="landing">
+    <h1 class="landing-title">Upload EPUB</h1>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="text-danger mb-3">
+            @foreach (var err in ViewData.ModelState.SelectMany(kv => kv.Value!.Errors))
+            {
+                <div>@err.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <form asp-controller="Library" asp-action="Upload" method="post" enctype="multipart/form-data"
+          class="landing-form" id="upload-form">
+        <label for="epubFile" class="upload-dropzone" id="upload-dropzone">
+            <span id="upload-dropzone-text">Choose an .epub file or drop it here</span>
+        </label>
+        <input type="file" name="epubFile" id="epubFile" accept=".epub" class="d-none" required />
+        <button type="submit" class="btn btn-light w-100 mt-3" id="upload-submit">Upload</button>
+    </form>
+
+    <a class="btn btn-link mt-3" asp-controller="Home" asp-action="Index" id="upload-back-link">Back</a>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var form = document.getElementById('upload-form');
+            var input = document.getElementById('epubFile');
+            var dropzone = document.getElementById('upload-dropzone');
+            var dropzoneText = document.getElementById('upload-dropzone-text');
+            var submitBtn = document.getElementById('upload-submit');
+
+            function showFileName(file) {
+                dropzoneText.textContent = file ? file.name : 'Choose an .epub file or drop it here';
+                dropzone.classList.toggle('has-file', !!file);
+            }
+
+            input.addEventListener('change', function () {
+                showFileName(input.files && input.files[0]);
+            });
+
+            ['dragover', 'dragenter'].forEach(function (evt) {
+                dropzone.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    dropzone.classList.add('drag-over');
+                });
+            });
+            ['dragleave', 'dragend', 'drop'].forEach(function (evt) {
+                dropzone.addEventListener(evt, function (e) {
+                    dropzone.classList.remove('drag-over');
+                });
+            });
+            dropzone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                var file = e.dataTransfer.files && e.dataTransfer.files[0];
+                if (file) {
+                    input.files = e.dataTransfer.files;
+                    showFileName(file);
+                }
+            });
+
+            form.addEventListener('submit', function () {
+                if (!input.files || input.files.length === 0) {
+                    return;
+                }
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Parsing your book&hellip;';
+                dropzone.classList.add('disabled');
+            });
+        })();
+    </script>
+}

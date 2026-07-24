@@ -1,0 +1,90 @@
+@model ReaderBundleViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var bootstrapJson = System.Text.Json.JsonSerializer.Serialize(Model, new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    });
+}
+
+<div id="reader-app" class="reader-app reader-loading" data-book-id="@Model.BookId">
+    <div id="reader-loading-overlay" class="reader-loading-overlay">
+        <div class="reader-loading-spinner"></div>
+    </div>
+
+    <!-- SIDEBAR TRÁI: Mục lục & Dấu trang -->
+    <aside id="sidebar-left" class="sidebar sidebar-left">
+        <div class="sidebar-section">
+            <a class="sidebar-back" data-i18n="backToLibrary" asp-controller="Library" asp-action="Index">&larr; Library</a>
+        </div>
+
+        <div class="sidebar-section">
+            <button type="button" class="sidebar-toggle" data-i18n="chapters" data-panel="panel-chapters">Chapters</button>
+            <ul id="panel-chapters" class="sidebar-panel sidebar-list open"></ul>
+        </div>
+
+        <div class="sidebar-section">
+            <button type="button" class="sidebar-toggle" data-i18n="bookmarks" data-panel="panel-bookmarks">Bookmarks</button>
+            <ul id="panel-bookmarks" class="sidebar-panel sidebar-list open"></ul>
+        </div>
+    </aside>
+
+    <!-- KHU VỰC ĐỌC CHÍNH -->
+    <main id="reader-center" class="reader-center">
+        <div class="reader-book-title" id="reader-book-title"></div>
+        <div id="reader-viewport" class="reader-viewport">
+            <div id="reader-columns" class="reader-content-box"></div>
+        </div>
+    </main>
+
+    <!-- SIDEBAR PHẢI: Cài đặt cá nhân -->
+    <aside id="sidebar-right" class="sidebar sidebar-right">
+        <div class="sidebar-section">
+            <label class="settings-label" data-i18n="darkMode">Chế độ tối</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="setting-dark-mode" checked>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <label class="settings-label" for="setting-language" data-i18n="language">Language</label>
+            <select id="setting-language" class="form-select form-select-sm settings-input">
+                <option value="en">English</option>
+                <option value="vi">Tiếng Việt</option>
+            </select>
+        </div>
+
+        <div class="sidebar-section">
+            <label class="settings-label" for="setting-font" data-i18n="font">Font</label>
+            <select id="setting-font" class="form-select form-select-sm settings-input">
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Iowan Old Style', Palatino, serif">Iowan / Palatino</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+                <option value="'Segoe UI', Arial, sans-serif">Segoe UI</option>
+                <option value="'Courier New', monospace">Courier New</option>
+            </select>
+        </div>
+
+        <div class="sidebar-section">
+            <label class="settings-label" for="setting-font-size"><span data-i18n="fontSize">Font Size</span> <span id="setting-font-size-val">18px</span></label>
+            <input type="range" min="12" max="48" step="1" id="setting-font-size" value="18" class="form-range">
+        </div>
+
+        <div class="sidebar-section">
+            <label class="settings-label" for="setting-line-height"><span data-i18n="lineHeight">Line Height</span> <span id="setting-line-height-val">1.7</span></label>
+            <input type="range" min="1.2" max="2.4" step="0.1" id="setting-line-height" value="1.7" class="form-range">
+        </div>
+
+        <div class="sidebar-section">
+            <label class="settings-label" for="setting-letter-spacing"><span data-i18n="letterSpacing">Letter Spacing</span> <span id="setting-letter-spacing-val">0.05em</span></label>
+            <input type="range" min="0" max="0.3" step="0.01" id="setting-letter-spacing" value="0.05" class="form-range">
+        </div>
+    </aside>
+</div>
+
+<script id="reader-bootstrap-data" type="application/json">@Html.Raw(bootstrapJson)</script>
+
+@section Scripts {
+    <script src="~/js/reader.js" asp-append-version="true"></script>
+}

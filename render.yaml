@@ -1,0 +1,31 @@
+databases:
+  - name: echobook-db
+    plan: free
+    databaseName: echobook
+    user: echobook
+
+services:
+  - type: web
+    name: echobook
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: echobook-db
+          property: connectionString
+    # NOTE: Render's free web service plan has an ephemeral filesystem - it does not support the
+    # persistent disks needed to keep Uploads/ and AudioCache/ across restarts and deploys. On the
+    # free plan, uploaded epubs, covers, and cached narration audio will be lost whenever the
+    # instance restarts or you redeploy (EF Core migrations and the database itself are unaffected,
+    # since those live in echobook-db). If that's not acceptable, upgrade this service to a paid
+    # plan and uncomment the disk block below.
+    # disk:
+    #   name: echobook-data
+    #   mountPath: /app/Uploads
+    #   sizeGB: 1
