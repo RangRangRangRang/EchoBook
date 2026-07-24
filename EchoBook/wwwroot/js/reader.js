@@ -31,9 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentChapterIndex = 0;
 
-    // Bookmark Storage
-    const storageKey = `echobook_bm_${readerData.bookId || 'default'}`;
-    let bookmarks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    // Keys lưu trữ LocalStorage
+    const bmStorageKey = `echobook_bm_${readerData.bookId || 'default'}`;
+    const progressStorageKey = `echobook_progress_${readerData.bookId || 'default'}`;
+    let bookmarks = JSON.parse(localStorage.getItem(bmStorageKey) || '[]');
+
+    // Timer xử lý Focus Mode
+    let focusModeTimer = null;
+    const FOCUS_TIMEOUT = 2500; // 2.5 giây đứng yên chuột để bật Focus Mode
 
     const translations = {
         en: {
@@ -75,11 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderBookmarksList();
         loadSettings();
 
-        if (readerData.chapters && readerData.chapters.length > 0) {
+        // Khôi phục tiến trình đọc tự động (BƯỚC 2)
+        const savedProgress = JSON.parse(localStorage.getItem(progressStorageKey) || 'null');
+        if (savedProgress && savedProgress.chapterIndex !== undefined && readerData.chapters && readerData.chapters[savedProgress.chapterIndex]) {
+            loadChapter(savedProgress.chapterIndex, savedProgress.scrollPos || 0);
+        } else if (readerData.chapters && readerData.chapters.length > 0) {
             loadChapter(0);
         }
 
         setupEventListeners();
+        setupFocusMode();
     }
 
     function applyLanguage(lang) {
@@ -146,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 bookmarks.splice(idx, 1);
-                localStorage.setItem(storageKey, JSON.stringify(bookmarks));
+                localStorage.setItem(bmStorageKey, JSON.stringify(bookmarks));
                 renderBookmarksList();
             });
 
@@ -167,8 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollPos: scrollPos
         });
 
-        localStorage.setItem(storageKey, JSON.stringify(bookmarks));
+        localStorage.setItem(bmStorageKey, JSON.stringify(bookmarks));
         renderBookmarksList();
+    }
+
+    // Tự động lưu vị trí đọc dở
+    function saveReadingProgress() {
+        if (!readerViewport) return;
+        const progress = {
+            chapterIndex: currentChapterIndex,
+            scrollPos: readerViewport.scrollTop,
+            updatedAt: new Date().getTime()
+        };
+        localStorage.setItem(progressStorageKey, JSON.stringify(progress));
     }
 
     async function loadChapter(index, targetScroll = 0) {
@@ -204,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             readerColumns.innerHTML = htmlContent || `<div class="text-center p-4">${noContentText}</div>`;
         }
 
-        // Tự chuyển cuộn: nếu targetScroll === 'bottom' thì cuộn xuống cuối trang
         setTimeout(() => {
             if (readerViewport) {
                 if (targetScroll === 'bottom') {
@@ -214,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if (readerApp) readerApp.classList.remove('reader-loading');
+            saveReadingProgress();
         }, 80);
 
         if (panelChapters) {
@@ -248,18 +269,50 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settingLanguage) applyLanguage(settingLanguage.value);
     }
 
+    // XỬ LÝ FOCUS MODE (BƯỚC 2)
+    function setupFocusMode() {
+        const showUI = () => {
+            if (readerApp) readerApp.classList.remove('focus-mode');
+            clearTimeout(focusModeTimer);
+            focusModeTimer = setTimeout(() => {
+                if (readerApp) readerApp.classList.add('focus-mode');
+            }, FOCUS_TIMEOUT);
+        };
+
+        // Rê chuột -> Hiện UI + Reset Đếm ngược Focus
+        document.addEventListener('mousemove', showUI);
+        document.addEventListener('mousedown', showUI);
+
+        // Khởi động đếm ngược lần đầu
+        focusModeTimer = setTimeout(() => {
+            if (readerApp) readerApp.classList.add('focus-mode');
+        }, FOCUS_TIMEOUT);
+    }
+
     function setupEventListeners() {
-        // ĐIỀU HƯỚNG PHÍM BẤM & TỰ CHUYỂN CHAPTER THÔNG MINH
+        // Tự động lưu vị trí đọc khi cuộn trang
+        if (readerViewport) {
+            let scrollDebounce = null;
+            readerViewport.addEventListener('scroll', () => {
+                clearTimeout(scrollDebounce);
+                scrollDebounce = setTimeout(saveReadingProgress, 200);
+            });
+        }
+
+        // ĐIỀU HƯỚNG PHÍM BẤM (KHÔNG BỊ THOÁT FOCUS MODE KHI BẤM PHÍM)
         document.addEventListener('keydown', (e) => {
             if (!readerViewport) return;
 
             const isAtTop = readerViewport.scrollTop <= 5;
             const isAtBottom = (readerViewport.scrollTop + readerViewport.clientHeight) >= (readerViewport.scrollHeight - 10);
 
+            let isNavKey = false;
+
             // Mũi tên Xuống
             if (e.code === 'ArrowDown') {
                 e.preventDefault();
                 readerViewport.scrollTop += 40;
+                isNavKey = true;
             }
             // Mũi tên Lên
             else if (e.code === 'ArrowUp') {
@@ -269,24 +322,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     readerViewport.scrollTop -= 40;
                 }
+                isNavKey = true;
             }
-            // Phím Mũi Tên Phải / Space / PageDown -> Cuộn trang hoặc Sang Chapter sau
+            // Phím Mũi Tên Phải / Space / PageDown
             else if (['ArrowRight', 'Space', 'PageDown'].includes(e.code)) {
                 e.preventDefault();
                 if (isAtBottom && currentChapterIndex < readerData.chapters.length - 1) {
-                    loadChapter(currentChapterIndex + 1, 0); // Sang đầu chapter sau
+                    loadChapter(currentChapterIndex + 1, 0);
                 } else {
                     readerViewport.scrollTop += (readerViewport.clientHeight - 60);
                 }
+                isNavKey = true;
             }
-            // Phím Mũi Tên Trái / PageUp -> Cuộn ngược lại hoặc Sang cuối Chapter trước
+            // Phím Mũi Tên Trái / PageUp
             else if (['ArrowLeft', 'PageUp'].includes(e.code)) {
                 e.preventDefault();
                 if (isAtTop && currentChapterIndex > 0) {
-                    loadChapter(currentChapterIndex - 1, 'bottom'); // Sang cuối chapter trước
+                    loadChapter(currentChapterIndex - 1, 'bottom');
                 } else {
                     readerViewport.scrollTop -= (readerViewport.clientHeight - 60);
                 }
+                isNavKey = true;
+            }
+
+            // Nếu nhấn phím điều hướng đọc: duy trì Focus Mode
+            if (isNavKey && readerApp && readerApp.classList.contains('focus-mode')) {
+                clearTimeout(focusModeTimer);
+                focusModeTimer = setTimeout(() => {
+                    if (readerApp) readerApp.classList.add('focus-mode');
+                }, FOCUS_TIMEOUT);
             }
         });
 

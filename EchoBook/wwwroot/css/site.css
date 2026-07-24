@@ -188,6 +188,7 @@ html, body, .reader-viewport, .sidebar, .sidebar-panel {
     overflow-y: auto;
     font-family: system-ui, -apple-system, sans-serif;
     flex-shrink: 0 !important;
+    transition: opacity 0.4s ease, transform 0.4s ease; /* Hiệu ứng Focus Mode */
 }
 
 .sidebar-right {
@@ -280,12 +281,13 @@ html, body, .reader-viewport, .sidebar, .sidebar-panel {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 90%;
+    transition: opacity 0.4s ease; /* Hiệu ứng Focus Mode */
 }
 
-/* PHÓNG TO CONTAINER NỘI DUNG ĐỌC RỘNG VÀ THOÁNG DỄ NHÌN */
+/* CONTAINER NỘI DUNG ĐỌC */
 .reader-viewport {
     width: 100% !important;
-    max-width: 2000px !important; /* Mở rộng chiều rộng khung sách */
+    max-width: 2000px !important;
     height: calc(100vh - 60px) !important;
     margin: 0 auto !important;
     position: relative;
@@ -323,4 +325,27 @@ html, body, .reader-viewport, .sidebar, .sidebar-panel {
     background-color: var(--eb-bg) !important;
     color: var(--eb-text) !important;
     border-color: var(--eb-border) !important;
+}
+
+/* ==========================================
+   4. FOCUS MODE STYLES (BƯỚC 2)
+   ========================================== */
+.reader-app.focus-mode {
+    cursor: none !important;
+}
+.reader-app.focus-mode .sidebar-left {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-20px);
+}
+
+.reader-app.focus-mode .sidebar-right {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px);
+}
+
+.reader-app.focus-mode .reader-book-title {
+    opacity: 0;
+    pointer-events: none;
 }
