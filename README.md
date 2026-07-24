@@ -1,10 +1,71 @@
-Bước 1: Hoàn thiện cơ bản phần library, upload và reader. Sidebar chương và setting đã hoàn thiện. Đã thành công tạo ket nhưng chưa áp dụng phần nhập key.
-Bước 2: (tiếp theo) Thêm chức năng focus mode: khi để yên con trỏ chuột thì sẽ ẩn hết các thanh công cụ, chỉ hiện phần nội dung chính. Ấn phím điều hướng 
-(mũi tên, space) thì sẽ vẫn ở trong focus mode, không bị hiển thị 2 side bar. Chỉ khi di chuyển chuột thì sẽ hiện lại các thanh công cụ. Thêm chức năng 
-khi đọc đến đoạn nào đó, tắt web đi rồi khi vào lại sách đó sẽ tự động được đưa đến đúng đoạn đó.
-Bước 3: (tiếp theo) Thêm chức năng tự động generate key và đổi thứ tự cửa sổ khi truy cập. khi mở web, giao diện mở web trình tự là: upload sách, nhập key, vào thư viện.
-Khi vào thư viện sẽ có giao diện library hiện tại, phần key sẽ được tự động generate riêng cho từng người dùng. 
-Khi người dùng vào lại web, sẽ được đưa đến giao diện nhập key, sau khi nhập key đúng thì sẽ được đưa đến thư viện. Còn không thì upload như thường.
-Bước 4: (tiếp theo) Hoàn thiện phần upload và reader, thêm chức năng audio ai và highlight text khi đọc đến đúng đoạn.
-Bước 5: (tiếp theo) Chuyển dổi từ sử dụng docker sang dùng postgresql, thêm chức năng lưu trữ sách và dữ liệu người dùng trên server.
-Bước 6: (tiếp theo) Public web, hoàn thiện các chức năng còn lại, tối ưu hóa giao diện và trải nghiệm người dùng. 
+# 📚 EchoBook - Web Reader & EPUB Management Platform
+
+**EchoBook** là ứng dụng đọc sách điện tử (EPUB Reader) trên nền tảng Web được xây dựng nhằm tối ưu hóa trải nghiệm đọc cho người dùng với giao diện tối giản, linh hoạt và giàu tính năng.
+
+---
+
+## 🚀 Kế Hoạch Phát Triển (Roadmap)
+
+### Bước 1: Khung Ứng Dụng Cơ Bản (Current Baseline)
+* [x] Hoàn thiện cơ bản giao diện **Library** (Thư viện) và **Upload EPUB**.
+* [x] Đã thiết kế hoàn thiện giao diện **Reader UI** (Khung đọc chính, Sidebar Chương/Mục lục và Sidebar Cài đặt phông chữ, cỡ chữ, khoảng cách...).
+* [x] Đã hoàn thành cơ chế tạo Key xác thực cơ bản (chưa áp dụng luồng nhập Key trên UI).
+
+---
+
+### Bước 2: Tối Ưu Trải Nghiệm Đọc (Focus Mode & Progress Tracking)
+* [ ] **Focus Mode (Chế độ tập trung):**
+  * Tự động ẩn toàn bộ công cụ, tiêu đề và 2 Sidebar khi người dùng để yên con trỏ chuột trong vài giây.
+  * Khi nhấn các phím điều hướng (`ArrowUp`, `ArrowDown`, `ArrowLeft`, `ArrowRight`, `Space`) để chuyển dòng/chương, ứng dụng vẫn giữ nguyên ở **Focus Mode** (không bị chớp hay hiện lại Sidebar).
+  * Chỉ hiển thị lại các thanh công cụ khi con trỏ chuột di chuyển.
+* [ ] **Lưu vị trí đọc tự động (Auto-save Progress):**
+  * Tự động lưu vết vị trí đọc hiện tại (chương và vị trí cuộn).
+  * Khi đóng trang web/trình duyệt và mở lại cuốn sách đó, hệ thống tự động cuộn đến chính xác đoạn đang đọc dở.
+
+---
+
+### Bước 3: Luồng Người Dùng & Quản Lý Key Truy Cập
+* [ ] **Tự động Generate Key:**
+  * Tạo Key riêng biệt cho từng người dùng/phiên làm việc.
+* [ ] **Đổi thứ tự luồng giao diện khi truy cập:**
+  1. **Lần đầu mở Web:** Giao diện Upload sách $\rightarrow$ Nhập Key $\rightarrow$ Vào Thư viện (Library).
+  2. **Các lần truy cập sau:** Hệ thống đưa người dùng đến màn hình **Nhập Key**:
+     * *Nếu nhập đúng Key:* Chuyển thẳng vào Thư viện (Library) cá nhân.
+     * *Nếu không nhập Key / Khách mới:* Chuyển đến luồng Upload sách mặc định.
+
+---
+
+### Bước 4: AI Voice & Highlight Text
+* [ ] **Hoàn thiện nâng cao Upload & Reader UI.**
+* [ ] **Tích hợp AI Audio (TTS - Text-to-Speech):** Tự động đọc nội dung sách bằng giọng đọc AI sinh động.
+* [ ] **Smart Highlight:** Tự động highlight (tô sáng) từng câu/đoạn văn bản tương ứng với thời điểm giọng đọc AI đang phát.
+
+---
+
+### Bước 5: Nâng Cấp Hệ Thống & Cơ Sở Dữ Liệu
+* [ ] Chuyển đổi toàn bộ kiến trúc lưu trữ từ Docker sang **PostgreSQL Database**.
+* [ ] Thêm tính năng lưu trữ tập trung file sách (EPUB/Covers) và dữ liệu tiến trình đọc người dùng trực tiếp trên Server.
+
+---
+
+### Bước 6: Public & Tối Ưu Hóa Cuối Cùng
+* [ ] Triển khai (Deploy) ứng dụng lên môi trường Production / Public Web.
+* [ ] Tối ưu hóa UI/UX toàn hệ thống, cải thiện tốc độ tải trang và phản hồi của người dùng.
+* [ ] Hoàn thiện các tính năng phụ phụ trợ và sửa các lỗi phát sinh.
+
+---
+
+## 🛠️ Công Nghệ Sử Dụng (Tech Stack)
+
+* **Backend:** C# / .NET Core (ASP.NET Core MVC)
+* **Frontend:** HTML5, CSS3, JavaScript (ES6+), Bootstrap
+* **Styling:** Custom CSS Flexbox/Grid (`site.css`)
+* **Storage / Database:** LocalStorage, PostgreSQL (Planned)
+
+---
+
+## 📝 Hướng Dẫn Cài Đặt & Chạy Cục Bộ (Local Setup)
+
+1. **Clone repository:**
+   ```bash
+   git clone [https://github.com/your-username/EchoBook.git](https://github.com/your-username/EchoBook.git)
