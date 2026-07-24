@@ -1,10 +1,10 @@
-# 📚 EchoBook - Web Reader & EPUB Management Platform
+# EchoBook - Web Reader & EPUB Management Platform
 
 **EchoBook** là ứng dụng đọc sách điện tử (EPUB Reader) trên nền tảng Web được xây dựng nhằm tối ưu hóa trải nghiệm đọc cho người dùng với giao diện tối giản, linh hoạt và giàu tính năng.
 
 ---
 
-## 🚀 Kế Hoạch Phát Triển (Roadmap)
+## Kế Hoạch Phát Triển (Roadmap)
 
 ### Bước 1: Khung Ứng Dụng Cơ Bản (Current Baseline)
 * [x] Hoàn thiện cơ bản giao diện **Library** (Thư viện) và **Upload EPUB**.
@@ -21,6 +21,7 @@
 * [ ] **Lưu vị trí đọc tự động (Auto-save Progress):**
   * Tự động lưu vết vị trí đọc hiện tại (chương và vị trí cuộn).
   * Khi đóng trang web/trình duyệt và mở lại cuốn sách đó, hệ thống tự động cuộn đến chính xác đoạn đang đọc dở.
+* [ ] **Đã hoàn thành**
 
 ---
 
@@ -64,7 +65,7 @@
 
 ---
 
-## 📝 Hướng Dẫn Cài Đặt & Chạy Cục Bộ (Local Setup)
+## Hướng Dẫn Cài Đặt & Chạy Cục Bộ (Local Setup)
 
 1. **Clone repository:**
    ```bash
