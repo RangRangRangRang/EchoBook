@@ -45,57 +45,240 @@ html, body, .reader-viewport, .sidebar, .sidebar-panel {
 }
 
 /* ==========================================
-   1. LANDING & UPLOAD
+   1. LANDING & GATEWAY PAGE (BƯỚC 3 - CHUẨN HOÀN CHỈNH)
    ========================================== */
-.landing {
+
+/* Khung nền tràn toàn màn hình */
+.landing,
+.landing-gateway {
     min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background-color: var(--eb-bg);
+    width: 100%;
+}
+
+/* Container Card chính: Phóng to 3 lần + Bo góc 90px */
+.gateway-card,
+.landing-card {
+    width: 100%;
+    max-width: 900px;
+    background: var(--eb-surface);
+    border: 2px solid var(--eb-border);
+    border-radius: 90px !important; /* Bo góc 90px theo yêu cầu */
+    padding: 55px 70px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 32px 20px;
     text-align: center;
-}
-
-.landing-title {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.landing-tagline {
-    color: var(--eb-text-dim);
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-}
-
-.landing-form {
-    width: 100%;
-    max-width: 480px;
     margin: 0 auto;
 }
 
+.gateway-title,
+.landing-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--eb-text);
+    letter-spacing: 0.02em;
+}
+
+.gateway-subtitle,
+.landing-tagline {
+    font-size: 1.1rem;
+    color: var(--eb-text-dim);
+    margin-bottom: 35px;
+}
+
+.gateway-section,
+.landing-form {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+}
+
+/* Khung kéo thả Upload EPUB lớn */
+.upload-dropzone-large,
 .upload-dropzone {
+    width: 100%;
+    min-height: 160px;
+    border: 2px dashed var(--eb-border);
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 140px;
-    padding: 24px;
-    border: 2px dashed var(--eb-border);
-    border-radius: 12px;
-    background: var(--eb-surface);
-    color: var(--eb-text-dim);
+    padding: 25px;
     cursor: pointer;
+    transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
-.landing-upload-btn {
+    .upload-dropzone-large:hover,
+    .upload-dropzone:hover {
+        border-color: var(--eb-teal);
+        background: rgba(0, 201, 167, 0.05);
+    }
+
+.dropzone-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.dropzone-text {
+    font-size: 1.1rem;
+    color: var(--eb-text-dim);
+}
+
+/* Dải phân cách (OR / HOẶC) */
+.gateway-divider,
+.landing-divider {
     width: 100%;
-    margin-top: 16px;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 0;
+    position: relative;
+}
+
+    .gateway-divider::before,
+    .landing-divider::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        background: var(--eb-border);
+        top: 50%;
+        left: 0;
+        z-index: 1;
+    }
+
+    .gateway-divider span,
+    .landing-divider span {
+        position: relative;
+        z-index: 2;
+        background: var(--eb-surface);
+        padding: 0 20px;
+        color: var(--eb-text-dim);
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.1em;
+    }
+
+/* Box hiển thị Key định danh sinh tự động */
+.key-info-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--eb-border);
+    padding: 12px 24px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+}
+
+.key-label {
     font-size: 1rem;
-    padding: 10px;
+    color: var(--eb-text-dim);
+}
+
+.key-value {
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--eb-teal);
+    letter-spacing: 0.08em;
+}
+
+.btn-copy {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
     cursor: pointer;
+    padding: 0 4px;
+}
+
+/* Ô nhập Key & các nút bấm */
+.key-input-group {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.gateway-input,
+.landing-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--eb-border);
+    color: var(--eb-text);
+    padding: 15px 24px;
+    border-radius: 20px;
+    font-size: 1.05rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+    .gateway-input:focus,
+    .landing-input:focus {
+        border-color: var(--eb-teal);
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+.btn-gateway,
+.landing-upload-btn {
+    padding: 15px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border: none;
+    white-space: nowrap;
+}
+
+.btn-teal {
+    background-color: var(--eb-teal);
+    color: #0d1117;
+    width: 100%;
+    margin-top: 18px;
+}
+
+    .btn-teal:hover {
+        background-color: var(--eb-teal-hover);
+        color: #0d1117;
+        transform: translateY(-2px);
+    }
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--eb-teal);
+    color: var(--eb-teal);
+}
+
+    .btn-outline:hover {
+        background: var(--eb-teal);
+        color: #0d1117;
+    }
+
+.key-error {
+    color: #e06c6c;
+    font-size: 0.95rem;
+    margin-top: 12px;
+}
+
+/* ĐÃ THÊM: CSS cho nút Upload khi chưa chọn file (disabled) */
+.btn-gateway:disabled {
+    background-color: var(--eb-border) !important;
+    color: var(--eb-text-dim) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
 }
 
 /* ==========================================
@@ -333,19 +516,20 @@ html, body, .reader-viewport, .sidebar, .sidebar-panel {
 .reader-app.focus-mode {
     cursor: none !important;
 }
-.reader-app.focus-mode .sidebar-left {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-20px);
-}
 
-.reader-app.focus-mode .sidebar-right {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(20px);
-}
+    .reader-app.focus-mode .sidebar-left {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-20px);
+    }
 
-.reader-app.focus-mode .reader-book-title {
-    opacity: 0;
-    pointer-events: none;
-}
+    .reader-app.focus-mode .sidebar-right {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(20px);
+    }
+
+    .reader-app.focus-mode .reader-book-title {
+        opacity: 0;
+        pointer-events: none;
+    }

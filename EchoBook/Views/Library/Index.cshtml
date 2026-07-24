@@ -58,15 +58,32 @@
 
 @section Scripts {
     <script>
-        document.querySelectorAll('[data-copy-key]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var key = btn.getAttribute('data-copy-key');
-                var restore = btn.textContent;
-                navigator.clipboard.writeText(key).then(function () {
-                    btn.textContent = 'Copied!';
-                    setTimeout(function () { btn.textContent = restore; }, 1500);
-                }).catch(function () { /* clipboard unavailable - key is still visible */ });
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Xử lý nút Copy Recovery Key
+            document.querySelectorAll('[data-copy-key]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var key = btn.getAttribute('data-copy-key');
+                    var restore = btn.textContent;
+                    navigator.clipboard.writeText(key).then(function () {
+                        btn.textContent = 'Copied!';
+                        setTimeout(function () { btn.textContent = restore; }, 1500);
+                    }).catch(function () { /* clipboard unavailable - key is still visible */ });
+                });
             });
+
+            // 2. Tự động sinh Key khi vào Thư viện thành công
+            const STORAGE_KEY_NAME = 'echobook_user_key';
+            let userKey = localStorage.getItem(STORAGE_KEY_NAME);
+            if (!userKey) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let part1 = '', part2 = '';
+                for (let i = 0; i < 4; i++) part1 += chars.charAt(Math.floor(Math.random() * chars.length));
+                for (let i = 0; i < 4; i++) part2 += chars.charAt(Math.floor(Math.random() * chars.length));
+                userKey = `ECHO-${part1}-${part2}`;
+                localStorage.setItem(STORAGE_KEY_NAME, userKey);
+            }
+
+            console.log("Your Generated Recovery Key:", userKey);
         });
     </script>
 }

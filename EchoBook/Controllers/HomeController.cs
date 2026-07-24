@@ -18,13 +18,6 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        // If a valid session cookie already exists, skip straight to the library.
-        var existing = await _currentRecoveryKeyAccessor.GetCurrentAsync();
-        if (existing is not null)
-        {
-            return RedirectToAction("Index", "Library");
-        }
-
         return View(new OpenLibraryViewModel());
     }
 

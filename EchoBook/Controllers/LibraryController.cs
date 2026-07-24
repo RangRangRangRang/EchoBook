@@ -19,9 +19,11 @@ public class LibraryController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
+        // Kiểm tra xem trình duyệt đã có Key active chưa
         var recoveryKey = await _currentRecoveryKeyAccessor.GetCurrentAsync();
         if (recoveryKey is null)
         {
+            // Nếu chưa có Key hợp lệ -> Đẩy về trang Gateway (Home) bắt buộc người dùng Nhập Key/Upload
             return RedirectToAction("Index", "Home");
         }
 
@@ -33,8 +35,7 @@ public class LibraryController : Controller
     [HttpGet]
     public async Task<IActionResult> Upload()
     {
-        // Upload is reachable even with no active key yet - a key is minted automatically
-        // on first successful upload, per spec.
+        // Trang Gateway / Chào mừng (chứa cả Form Upload lẫn Form Nhập Key)
         var recoveryKey = await _currentRecoveryKeyAccessor.GetCurrentAsync();
         ViewBag.HasExistingKey = recoveryKey is not null;
         return View();
@@ -69,11 +70,13 @@ public class LibraryController : Controller
         var (_, recoveryKey) = await _bookService.UploadEpubAsync(
             existingKey?.Id, epubFile.FileName, epubFile.Length, stream);
 
-        // Ensure the browser is now tied to this key, whether it was just created or already existed.
+        // Ghi đè / Đặt Cookie active Key mới/hiện tại cho trình duyệt
         _currentRecoveryKeyAccessor.SetActiveKeyCookie(recoveryKey.Id);
 
         TempData["JustCreatedKey"] = existingKey is null ? recoveryKey.Code : null;
-        return RedirectToAction("Index");
+
+        // Upload sách thành công -> Chuyển hướng người dùng thẳng vào Thư viện (Library Index)
+        return RedirectToAction("Index", "Library");
     }
 
     [HttpPost]
@@ -87,6 +90,6 @@ public class LibraryController : Controller
         }
 
         await _bookService.DeleteBookAsync(recoveryKey.Id, id);
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", "Library");
     }
 }

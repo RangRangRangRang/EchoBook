@@ -48,23 +48,28 @@ public class BookService : IBookService
             relativeCoverPath = await _fileStorageService.SaveCoverAsync(
                 recoveryKey.Id, bookId, parsed.CoverImageBytes, parsed.CoverImageExtension ?? ".jpg");
         }
+        static string? Truncate(string? value, int maxLength = 450)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
 
         var book = new Book
         {
             Id = bookId,
             RecoveryKeyId = recoveryKey.Id,
-            Title = parsed.Title,
-            Author = parsed.Author,
+            Title = Truncate(parsed.Title) ?? "Untitled",
+            Author = Truncate(parsed.Author),
             EpubFilePath = relativeEpubPath,
-            CoverImagePath = relativeCoverPath,
+            CoverImagePath = Truncate(relativeCoverPath),
             FileSizeBytes = fileSizeBytes,
             UploadedAtUtc = DateTime.UtcNow,
             Chapters = parsed.Chapters.Select(c => new Chapter
             {
                 Id = Guid.NewGuid(),
                 Order = c.Order,
-                Title = c.Title,
-                EpubItemHref = c.EpubItemHref
+                Title = Truncate(c.Title) ?? $"Chapter {c.Order}",
+                EpubItemHref = Truncate(c.EpubItemHref)
             }).ToList()
         };
 

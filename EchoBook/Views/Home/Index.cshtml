@@ -1,99 +1,69 @@
+@model OpenLibraryViewModel
 @{
-    ViewData["Title"] = "EchoBook - Home";
+    ViewData["Title"] = "EchoBook - Gateway";
 }
 
-<div class="landing page-fade-in">
-    <!-- Logo Icon -->
-    <div class="landing-logo mb-3">
-        <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="url(#logo-grad)" stroke="#20c997" stroke-width="2" />
-            <path d="M32 35L50 22L68 35V65L50 78L32 65V35Z" stroke="white" stroke-width="5" stroke-linejoin="round" />
-            <path d="M50 38L62 47V57L50 64L38 57V47L50 38Z" fill="white" />
-            <defs>
-                <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#00c9a7" />
-                    <stop offset="1" stop-color="#148570" />
-                </linearGradient>
-            </defs>
-        </svg>
-    </div>
+<div class="landing-gateway">
+    <div class="gateway-card">
+        <h1 class="gateway-title">Hello, Welcome to EchoBook</h1>
+        <p class="gateway-subtitle">Click button or drag & drop to upload your EPUB book</p>
 
-    <h1 class="landing-title">Hello, Welcome to EchoBook</h1>
-    <p class="landing-tagline">Click button or drag & drop to upload your EPUB book</p>
-
-    <!-- Upload Form / Dropzone -->
-    <form asp-controller="Library" asp-action="Upload" method="post" enctype="multipart/form-data" id="upload-form" class="landing-form mb-4">
-        <div id="dropzone" class="upload-dropzone mb-3">
-            <input type="file" name="file" id="file-input" accept=".epub" class="d-none" />
-            <div id="dropzone-text">
-                <i class="bi bi-cloud-arrow-up display-6 d-block mb-2 text-teal"></i>
-                <span id="file-name-text">Drag & drop EPUB file here</span>
-            </div>
-        </div>
-
-        <button type="button" id="btn-select-file" class="btn btn-teal w-100 py-3 fw-bold landing-upload-btn">
-            Open EPUB book
-        </button>
-    </form>
-
-    <div class="landing-divider">OR</div>
-
-    <!-- Recovery Key Form & Go to Library Button -->
-    <div class="landing-secondary-actions">
-        <form asp-controller="Library" asp-action="OpenWithKey" method="get" class="d-flex gap-2 mb-3">
-            <input type="text" name="key" class="form-control landing-input" placeholder="Enter Recovery Key..." required />
-            <button type="submit" class="btn btn-outline-light text-nowrap">Enter Key</button>
+        <!-- CỤM 1: UPLOAD SÁCH (Có bước bấm nút Upload xác nhận) -->
+        <form id="gateway-upload-form" action="/Library/Upload" method="post" enctype="multipart/form-data" class="gateway-section">
+            @Html.AntiForgeryToken()
+            <label for="gateway-file-input" class="upload-dropzone-large">
+                <div class="dropzone-icon">📁</div>
+                <div class="dropzone-text" id="gateway-dropzone-label">Drag & drop EPUB file here or click to choose</div>
+                <input type="file" id="gateway-file-input" name="epubFile" accept=".epub" hidden />
+            </label>
+            <!-- Nút Upload đóng vai trò gửi form (chỉ hoạt động khi đã chọn file) -->
+            <button type="submit" id="gateway-btn-upload" class="btn-gateway btn-teal" disabled>Upload</button>
         </form>
 
-        <a asp-controller="Library" asp-action="Index" class="btn btn-link text-dim text-decoration-none">
-            Go to Library &rarr;
-        </a>
+        <!-- DẢI PHÂN CÁCH -->
+        <div class="gateway-divider">
+            <span>OR</span>
+        </div>
+
+        <!-- CỤM 2: NHẬP KEY LÊN TRÊN, TO LIBRARY XUỐNG DƯỚI -->
+        <div class="gateway-section">
+            <!-- Nhập Key nằm ở trên -->
+            <form action="/Home/OpenLibrary" method="post" class="w-100 mb-3">
+                @Html.AntiForgeryToken()
+                <div class="key-input-group">
+                    <input type="text" name="RecoveryKeyCode" id="user-key-input" class="gateway-input" placeholder="Enter Recovery Key..." required />
+                    <button type="submit" class="btn-gateway btn-outline">Enter Key &rarr;</button>
+                </div>
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="key-error">@Html.ValidationSummary(true)</div>
+                }
+            </form>
+
+            <!-- To Library nằm ở dưới -->
+            <a href="/Library" class="btn-gateway btn-outline w-100 text-center text-decoration-none">To Library &rarr;</a>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const dropzone = document.getElementById('dropzone');
-            const fileInput = document.getElementById('file-input');
-            const btnSelect = document.getElementById('btn-select-file');
-            const uploadForm = document.getElementById('upload-form');
-            const fileNameText = document.getElementById('file-name-text');
+            const fileInput = document.getElementById('gateway-file-input');
+            const dropzoneLabel = document.getElementById('gateway-dropzone-label');
+            const btnUpload = document.getElementById('gateway-btn-upload');
 
-            if (btnSelect && fileInput) {
-                btnSelect.addEventListener('click', () => fileInput.click());
-            }
-
-            if (dropzone && fileInput) {
-                dropzone.addEventListener('click', () => fileInput.click());
-
-                dropzone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dropzone.classList.add('drag-over');
-                });
-
-                dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
-
-                dropzone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    dropzone.classList.remove('drag-over');
-                    if (e.dataTransfer.files.length > 0) {
-                        fileInput.files = e.dataTransfer.files;
-                        handleFileSelected();
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                        dropzoneLabel.textContent = `Selected: ${e.target.files[0].name}`;
+                        dropzoneLabel.style.color = '#00c9a7';
+                        // Kích hoạt nút Upload sau khi chọn file
+                        if (btnUpload) {
+                            btnUpload.removeAttribute('disabled');
+                        }
                     }
                 });
-
-                fileInput.addEventListener('change', handleFileSelected);
-            }
-
-            function handleFileSelected() {
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    if (fileNameText) fileNameText.textContent = `Selected: ${file.name}`;
-                    dropzone.classList.add('has-file');
-                    // Tự động Submit form khi chọn xong file
-                    uploadForm.submit();
-                }
             }
         });
     </script>
