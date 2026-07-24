@@ -14,26 +14,21 @@
 ---
 
 ### Bước 2: Tối Ưu Trải Nghiệm Đọc (Focus Mode & Progress Tracking)
-* [ ] **Focus Mode (Chế độ tập trung):**
+* [x] **Focus Mode (Chế độ tập trung):**
   * Tự động ẩn toàn bộ công cụ, tiêu đề và 2 Sidebar khi người dùng để yên con trỏ chuột trong vài giây.
   * Khi nhấn các phím điều hướng (`ArrowUp`, `ArrowDown`, `ArrowLeft`, `ArrowRight`, `Space`) để chuyển dòng/chương, ứng dụng vẫn giữ nguyên ở **Focus Mode** (không bị chớp hay hiện lại Sidebar).
   * Chỉ hiển thị lại các thanh công cụ khi con trỏ chuột di chuyển.
-* [ ] **Lưu vị trí đọc tự động (Auto-save Progress):**
+* [x] **Lưu vị trí đọc tự động (Auto-save Progress):**
   * Tự động lưu vết vị trí đọc hiện tại (chương và vị trí cuộn).
   * Khi đóng trang web/trình duyệt và mở lại cuốn sách đó, hệ thống tự động cuộn đến chính xác đoạn đang đọc dở.
-* [ ] **Đã hoàn thành**
 
 ---
 
 ### Bước 3: Luồng Người Dùng & Quản Lý Key Truy Cập
-* [ ] **Tự động Generate Key:**
+* [x] **Tự động Generate Key:**
   * Tạo Key riêng biệt cho từng người dùng/phiên làm việc.
-* [ ] **Đổi thứ tự luồng giao diện khi truy cập:**
-  1. **Lần đầu mở Web:** Giao diện Upload sách $\rightarrow$ Nhập Key $\rightarrow$ Vào Thư viện (Library).
-  2. **Các lần truy cập sau:** Hệ thống đưa người dùng đến màn hình **Nhập Key**:
-     * *Nếu nhập đúng Key:* Chuyển thẳng vào Thư viện (Library) cá nhân.
-     * *Nếu không nhập Key / Khách mới:* Chuyển đến luồng Upload sách mặc định.
-
+* [x] **Cập nhật luồng giao diện khi truy cập:**
+ 
 ---
 
 ### Bước 4: AI Voice & Highlight Text
